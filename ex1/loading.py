@@ -10,6 +10,33 @@ optional (only if fetching real data from an external API).
 Authorized: pandas, requests, matplotlib, numpy, sys, importlib.
 """
 
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+import sys
+import importlib.metadata
+
+def main() -> None:
+    print(f"LOADING STATUS: Loading")
+    print()
+    print(f"Checking dependencies")
+    print(f"[OK] pandas ({importlib.metadata.version('pandas')}) - Data manipulation ready")
+    print(f"[OK] numpy ({importlib.metadata.version('numpy')}) - Numerical computation ready")
+    print(f"[OK] matplotlib ({importlib.metadata.version('matplotlib')}) - Visualization ready")
+    
+    print("Analyzing Matrix data...")
+    rng = np.random.default_rng()
+    data = rng.normal(0, 1, 1000)
+    df = pd.DataFrame({"value": data})
+    df["rolling_mean"] = df["value"].rolling(window=50).mean()
+    df["cumulative"] = df["value"].cumsum()
+    print(df["value"].describe().to_string())
+
+    print("Processing 1000 data points...")
+    print("Generating visualization...")
+if __name__ == "__main__":
+    main()
+
 # --- Expected behavior ---
 # $> python loading.py
 #

@@ -1,0 +1,30 @@
+# [tools.poetry]
+# name = "loading"
+# version = "0.1.0"
+# description = "Matrix data analysis tool"
+# authors = ["ttakemur"]
+
+# [tools.poetry.dependencies]
+# python = "^3.10"
+# pandas = "~2.1.0"
+# numpy = ">=2.0.0,<2.4.0"
+# matplotlib = "*"
+
+[project]
+name = "loading"
+version = "0.1.0"
+description = "Matrix data analysis tool"
+authors = [
+    {name = "ttakemur"}
+]
+requires-python = "3.10.12"
+dependencies = [
+    "pandas (>=2.3.3,<2.4.0)",
+    "numpy (>=2.0.0,<2.4.0)",
+    "matplotlib (==3.10.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
