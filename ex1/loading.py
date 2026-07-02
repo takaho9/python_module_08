@@ -10,30 +10,65 @@ optional (only if fetching real data from an external API).
 Authorized: pandas, requests, matplotlib, numpy, sys, importlib.
 """
 
-import pandas as pd
-import matplotlib.pyplot as plt
-import numpy as np
-import sys
-import importlib.metadata
+from importlib.metadata import version, PackageNotFoundError
+from importlib import import_module
+try:
+    import numpy as np
+    import pandas as pd
+except PackageNotFoundError as e:
+    print(f"PackageNotFoundError: {e.name} not found")
 
-def main() -> None:
-    print(f"LOADING STATUS: Loading")
-    print()
-    print(f"Checking dependencies")
-    print(f"[OK] pandas ({importlib.metadata.version('pandas')}) - Data manipulation ready")
-    print(f"[OK] numpy ({importlib.metadata.version('numpy')}) - Numerical computation ready")
-    print(f"[OK] matplotlib ({importlib.metadata.version('matplotlib')}) - Visualization ready")
-    
+
+DATA_POINTS = 1000
+OUTPUT_FILE = "matrix_analysis.png"
+
+def check_dependencies() -> None:
+    print("Checking dependencies")
+    print(f"[OK] pandas ({version('pandas')}) - Data manipulation ready")
+    print(f"[OK] numpy ({version('numpy')}) - Numerical computation ready")
+    print(f"[OK] matplotlib ({version('matplotlib')}) - Visualization ready")
+
+def prepare_data() -> pd.DataFrame:
     print("Analyzing Matrix data...")
     rng = np.random.default_rng()
-    data = rng.normal(0, 1, 1000)
+    data = rng.normal(0, 1, DATA_POINTS)
     df = pd.DataFrame({"value": data})
     df["rolling_mean"] = df["value"].rolling(window=50).mean()
     df["cumulative"] = df["value"].cumsum()
-    print(df["value"].describe().to_string())
+    return df
 
-    print("Processing 1000 data points...")
+def visualize_data(df: pd.DataFrame) -> None:
+    try:
+        matplotlib = import_module("matplotlib")
+    except PackageNotFoundError as e:
+        print(f"PackageNotFoundError: {e.name} not found")
+    matplotlib.use("Agg")
+    try:
+        plt = import_module("matplotlib.pyplot")
+    except PackageNotFoundError as e:
+        print(f"PacakgeNotFoundError: {e.name} not found")
+    fig, ax = plt.subplots(figsize=(10, 5))
+    ax.plot(df.index, df["value"], alpha=0.4, label="signal")
+    ax.plot(df.index, df["rolling_mean"], color="red", label="rolling mean (50)")
+    ax.set_title("Matrix Data Analysis")
+    ax.set_xlabel("data point")
+    ax.set_ylabel("value")
+    ax.legend()
+    fig.savefig(OUTPUT_FILE)
+    plt.close(fig)
+
+def main() -> None:
+    print("LOADING STATUS: Loading")
+    print()
+    check_dependencies()
+    df = prepare_data()
+    visualize_data(df)
+    
+
+    print(f"Processing {DATA_POINTS} data points...")
     print("Generating visualization...")
+
+
 if __name__ == "__main__":
     main()
 
