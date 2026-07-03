@@ -1,15 +1,3 @@
-"""Exercise 1: Loading Programs — loading.py
-
-Data analysis tool demonstrating mastery of package management with both pip
-and Poetry. Uses pandas (data manipulation), numpy (numerical computation and
-to generate the simulated Matrix data — not hardcoded lists or range()), and
-matplotlib (visualization). Handles missing dependencies gracefully and shows
-the difference between pip and Poetry dependency management. requests is
-optional (only if fetching real data from an external API).
-
-Authorized: pandas, requests, matplotlib, numpy, sys, importlib.
-"""
-
 from __future__ import annotations
 
 import sys

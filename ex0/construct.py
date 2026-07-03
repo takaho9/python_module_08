@@ -1,14 +1,3 @@
-"""Exercise 0: Entering the Matrix — construct.py
-
-Detect whether the program is running inside a Python virtual environment,
-display information about the current Python environment, give instructions
-for creating/activating a venv if none is detected, and show the difference
-between global and virtual environment package locations.
-
-Authorized: sys, os, site modules, print().
-"""
-
-
 import sys
 import os
 import site
