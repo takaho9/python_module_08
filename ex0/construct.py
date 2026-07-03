@@ -25,9 +25,9 @@ def print_for_venv() -> None:
     print("Safe to install packages without affecting")
     print("the global system.")
     print()
-    print("Package locations:")
+    print("Package installation path:")
     for path in site.getsitepackages():
-        print(f"  - {path}")
+        print(path)
 
 
 def print_for_genv() -> None:
@@ -45,10 +45,6 @@ def print_for_genv() -> None:
     print(r"matrix_env\Scripts\activate # On Windows")
     print()
     print("Then run this program again.")
-    print()
-    print("Package locations:")
-    for path in site.getsitepackages():
-        print(f"  - {path}")
 
 
 def main() -> None:

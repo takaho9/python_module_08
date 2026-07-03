@@ -10,25 +10,53 @@ optional (only if fetching real data from an external API).
 Authorized: pandas, requests, matplotlib, numpy, sys, importlib.
 """
 
-from importlib.metadata import version, PackageNotFoundError
+from __future__ import annotations
+
+import sys
 from importlib import import_module
-try:
-    import numpy as np
+from importlib.metadata import version, PackageNotFoundError
+from importlib.util import find_spec
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
     import pandas as pd
-except PackageNotFoundError as e:
-    print(f"PackageNotFoundError: {e.name} not found")
 
 
 DATA_POINTS = 1000
 OUTPUT_FILE = "matrix_analysis.png"
+REQUIRED = {
+    "pandas": "Data manipulation ready",
+    "numpy": "Numerical computation ready",
+    "matplotlib": "Visualization ready",
+}
 
-def check_dependencies() -> None:
-    print("Checking dependencies")
-    print(f"[OK] pandas ({version('pandas')}) - Data manipulation ready")
-    print(f"[OK] numpy ({version('numpy')}) - Numerical computation ready")
-    print(f"[OK] matplotlib ({version('matplotlib')}) - Visualization ready")
+
+def check_dependencies() -> list[str]:
+    print("Checking dependencies:")
+    missing: list[str] = []
+    for name, message in REQUIRED.items():
+        if find_spec(name) is None:
+            print(f"[MISSING] {name} - not installed")
+            missing.append(name)
+            continue
+        try:
+            print(f"[OK] {name} ({version(name)}) - {message}")
+        except PackageNotFoundError:
+            print(f"[OK] {name} (unknown version) - {message}")
+    return missing
+
+
+def report_missing(missing: list[str]) -> None:
+    print()
+    print(f"Missing dependencies: {', '.join(missing)}")
+    print("Install them with either tool:")
+    print("  pip install -r requirements.txt   # pip")
+    print("  poetry install                    # Poetry")
+
 
 def prepare_data() -> pd.DataFrame:
+    import numpy as np
+    import pandas as pd
     print("Analyzing Matrix data...")
     rng = np.random.default_rng()
     data = rng.normal(0, 1, DATA_POINTS)
@@ -37,19 +65,15 @@ def prepare_data() -> pd.DataFrame:
     df["cumulative"] = df["value"].cumsum()
     return df
 
+
 def visualize_data(df: pd.DataFrame) -> None:
-    try:
-        matplotlib = import_module("matplotlib")
-    except PackageNotFoundError as e:
-        print(f"PackageNotFoundError: {e.name} not found")
+    matplotlib = import_module("matplotlib")
     matplotlib.use("Agg")
-    try:
-        plt = import_module("matplotlib.pyplot")
-    except PackageNotFoundError as e:
-        print(f"PacakgeNotFoundError: {e.name} not found")
+    plt = import_module("matplotlib.pyplot")
     fig, ax = plt.subplots(figsize=(10, 5))
     ax.plot(df.index, df["value"], alpha=0.4, label="signal")
-    ax.plot(df.index, df["rolling_mean"], color="red", label="rolling mean (50)")
+    ax.plot(df.index, df["rolling_mean"], color="red",
+            label="rolling mean (50)")
     ax.set_title("Matrix Data Analysis")
     ax.set_xlabel("data point")
     ax.set_ylabel("value")
@@ -57,37 +81,23 @@ def visualize_data(df: pd.DataFrame) -> None:
     fig.savefig(OUTPUT_FILE)
     plt.close(fig)
 
-def main() -> None:
-    print("LOADING STATUS: Loading")
-    print()
-    check_dependencies()
-    df = prepare_data()
-    visualize_data(df)
-    
 
+def main() -> None:
+    print("LOADING STATUS: Loading programs...")
+    print()
+    missing = check_dependencies()
+    if missing:
+        report_missing(missing)
+        sys.exit(1)
+    print()
+    df = prepare_data()
     print(f"Processing {DATA_POINTS} data points...")
+    visualize_data(df)
     print("Generating visualization...")
+    print()
+    print("Analysis complete!")
+    print(f"Results saved to: {OUTPUT_FILE}")
 
 
 if __name__ == "__main__":
     main()
-
-# --- Expected behavior ---
-# $> python loading.py
-#
-# LOADING STATUS: Loading programs...
-#
-# Checking dependencies:
-# [OK] pandas (2.1.0) - Data manipulation ready
-# [OK] numpy (1.25.0) - Numerical computation ready
-# [OK] requests (2.31.0) - Network access ready
-# [OK] matplotlib (3.7.2) - Visualization ready
-#
-# Analyzing Matrix data...
-# Processing 1000 data points...
-# Generating visualization...
-#
-# Analysis complete!
-# Results saved to: matrix_analysis.png
-#
-# Note: the requests line only appears if you fetch data from an API.
